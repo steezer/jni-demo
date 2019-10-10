@@ -4,6 +4,26 @@
 #include <string.h>
 #include <steeze/util.h>
 
+static jint getMaxSupportVersion(){
+#ifdef JNI_VERSION_1_8
+    return JNI_VERSION_1_8;
+#else
+    #ifdef JNI_VERSION_1_6
+        return JNI_VERSION_1_6;
+    #else
+        #ifdef JNI_VERSION_1_4
+            return JNI_VERSION_1_4;
+        #else
+            #ifdef JNI_VERSION_1_2
+                return JNI_VERSION_1_2;
+            #else
+                return JNI_VERSION_1_1;
+            #endif
+        #endif
+    #endif
+#endif
+}
+
 //读取类文件
 static char *getClassContent(const char* path, int *len)
 {
@@ -78,7 +98,8 @@ void testFindClass(JNIEnv *env)
     printf("testFindClass finished\n\n"); 
 }
 
-JNIEXPORT void JNICALL Java_HelloWorld_displayHelloWorld(JNIEnv *env, jobject obj)  
+
+JNIEXPORT void JNICALL displayHelloWorld(JNIEnv *env, jobject obj)  
 {
     //获取版本号
     int version=(*env)->GetVersion(env);
@@ -125,7 +146,7 @@ JNIEXPORT void JNICALL Java_HelloWorld_displayHelloWorld(JNIEnv *env, jobject ob
 }
 
 //字符串的接受与返回
-JNIEXPORT jstring JNICALL Java_HelloWorld_hello(JNIEnv *env, jobject obj, jstring contentStr) 
+JNIEXPORT jstring JNICALL hello(JNIEnv *env, jobject obj, jstring contentStr) 
 {
     //获取字符串指针，必须使用指针，不能使用char strContent[],因为GetStringUTFChars()返回值为const char *;
     const char *strContent = (*env)->GetStringUTFChars(env, contentStr, JNI_FALSE);
@@ -149,7 +170,7 @@ JNIEXPORT jstring JNICALL Java_HelloWorld_hello(JNIEnv *env, jobject obj, jstrin
     return (*env)->NewStringUTF(env, strTemp);
 }
 
-JNIEXPORT jarray JNICALL Java_HelloWorld_md5(JNIEnv *env, jobject obj, jarray array) 
+JNIEXPORT jarray JNICALL set_md5(JNIEnv *env, jobject obj, jarray array) 
 {
     jsize len=(*env)->GetArrayLength(env, array);
 
@@ -180,13 +201,36 @@ JNIEXPORT jarray JNICALL Java_HelloWorld_md5(JNIEnv *env, jobject obj, jarray ar
     return result;
 }
 
+//添加导出映射
+static JNINativeMethod s_methods[] = {
+    {"displayHelloWorld", "()V", (void*)displayHelloWorld},
+    {"hello", "(Ljava/lang/String;)Ljava/lang/String;", (void*)hello},
+    {"md5", "([Ljava/lang/String;)[Ljava/lang/String;", (void*)set_md5},
+};
 
-
-
-
-
-
-
-
+//虚拟机加载时执行的方法
+jint JNI_OnLoad(JavaVM* vm, void* reserved)
+{
+    JNIEnv* env = NULL;
+    jint version=getMaxSupportVersion();
+    if(
+        (*vm)->GetEnv(vm, (void**) &env, version) != JNI_OK
+    ){
+        return JNI_ERR;
+    }
+    
+    //绑定映射
+    jclass cls = (*env)->FindClass(env,"LHelloWorld;");
+    if (cls != NULL)
+    {
+        int len = sizeof(s_methods) / sizeof(s_methods[0]);
+        if ((*env)->RegisterNatives(env, cls, s_methods, len) < 0)
+        {
+            return JNI_ERR;
+        }
+    }
+    
+    return version;
+}
 
 
