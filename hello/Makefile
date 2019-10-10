@@ -1,8 +1,8 @@
-HelloWorld.class: lib/libhello.jnilib HelloWorld.java
+HelloWorld.class: lib/libhello.so HelloWorld.java
 	@javac HelloWorld.java
 
-lib/libhello.jnilib: lib/HelloWorldImpl.c Test.class
-	@gcc -dynamiclib -o lib/libhello.jnilib lib/*.c
+lib/libhello.so: lib/HelloWorldImpl.c Test.class
+	@gcc -shared -fPIC  -o lib/libhello.so lib/*.c
 
 lib/HelloWorldImpl.c: lib/HelloWorld.h
 Test.class: Test.java
