@@ -1,11 +1,10 @@
 ifeq ($(shell uname),Darwin)
 EXT=jnilib
-LDFLAGS=-dynamiclib
+LDFLAGS=-dynamiclib -lsteeze
 else
 EXT=so
-LDFLAGS=-shared -fPIC
+LDFLAGS=-shared -fPIC -lsteeze
 endif
-
 
 HelloWorld.class: lib/libhello.$(EXT) HelloWorld.java
 	@javac HelloWorld.java

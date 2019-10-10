@@ -2,6 +2,7 @@
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
+#include <steeze/util.h>
 
 //读取类文件
 static char *getClassContent(const char* path, int *len)
@@ -132,7 +133,8 @@ JNIEXPORT jstring JNICALL Java_HelloWorld_hello(JNIEnv *env, jobject obj, jstrin
  
     //字符串拼接,实现strContent+str1,因为strcat的第一个参数必须为非const类型(可变)，所以不能直接使用strcat()
     //创建一个新的字符串指针
-    char *strTemp = (char *) malloc(strlen(strContent) + strlen(str) + 3);
+    //char *strTemp = (char *) malloc(strlen(strContent) + strlen(str) + 3);
+    char strTemp[strlen(strContent) + strlen(str) + 3];
     //拷贝常量到字符串指针
     strcpy(strTemp, strContent);
     //拼接str1到strTemp
@@ -146,4 +148,45 @@ JNIEXPORT jstring JNICALL Java_HelloWorld_hello(JNIEnv *env, jobject obj, jstrin
     //返回一个utf的jstring
     return (*env)->NewStringUTF(env, strTemp);
 }
+
+JNIEXPORT jarray JNICALL Java_HelloWorld_md5(JNIEnv *env, jobject obj, jarray array) 
+{
+    jsize len=(*env)->GetArrayLength(env, array);
+
+    jclass strArrayClass = (*env)->FindClass(env,"Ljava/lang/String;");
+    jarray result=(*env)->NewObjectArray(env, len, strArrayClass, NULL);
+
+    char md5[33];
+    for(int i=0;i< len; i++){
+        //获取对象元素
+        jobject cObj=(*env)->GetObjectArrayElement(env, array, i);
+
+        //从对象元素中获取字符串
+        const char* str=(*env)->GetStringUTFChars(env, cObj, JNI_FALSE);
+        printf("rev: %s\n", str);
+
+        //设置MD5
+        stz_md5(md5, str);
+
+        //告诉虚拟机不在jni代码不再需要str字符串
+        (*env)->ReleaseStringUTFChars(env, cObj, str);
+
+        //设置新的值
+        jobject val=(*env)->NewStringUTF(env, md5);
+        (*env)->SetObjectArrayElement(env, result, i, val);
+        //删除局部引用
+        (*env)->DeleteLocalRef(env, val);
+    }
+    return result;
+}
+
+
+
+
+
+
+
+
+
+
 
