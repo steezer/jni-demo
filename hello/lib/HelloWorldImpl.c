@@ -91,8 +91,15 @@ void testFindClass(JNIEnv *env)
         jmethodID showId=(*env)->GetMethodID(env, test, "show", "()V");
         if(showId!=NULL){
             (*env)->CallVoidMethod(env, obj, showId);
-            // (*env)->call
-            printf("CallVoidMethod success\n"); 
+
+            //调用错误检查
+            if((*env)->ExceptionCheck(env)){
+                //打印错误信息
+                (*env)->ExceptionDescribe(env);
+                printf("CallVoidMethod failed\n"); 
+            }else{
+                printf("CallVoidMethod success\n"); 
+            }
         }
     }
     printf("testFindClass finished\n\n"); 

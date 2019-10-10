@@ -7,6 +7,10 @@ class Test {
     }
 
     public void show(){
+        //错误测试
+        int a=1;
+        int b=0;
+        int c=a/b;
         System.out.println("in java=> show version: "+this.version);
     }
 
