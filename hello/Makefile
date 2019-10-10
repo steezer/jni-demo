@@ -18,7 +18,7 @@ HelloWorld.class: lib/$(TARGET).$(EXT) HelloWorld.java
 	@javac HelloWorld.java
 
 lib/$(TARGET).$(EXT): lib/HelloWorldImpl.c Test.class
-	@gcc $(LDFLAGS)  -o lib/$(TARGET).$(EXT) lib/*.c
+	@gcc -std=c99 $(LDFLAGS)  -o lib/$(TARGET).$(EXT) lib/*.c
 
 lib/HelloWorldImpl.c: lib/HelloWorld.h
 Test.class: Test.java
