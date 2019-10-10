@@ -1,8 +1,17 @@
-HelloWorld.class: lib/libhello.so HelloWorld.java
+ifeq ($(shell uname),Darwin)
+EXT=jnilib
+LDFLAGS=-dynamiclib
+else
+EXT=so
+LDFLAGS=-shared -fPIC
+endif
+
+
+HelloWorld.class: lib/libhello.$(EXT) HelloWorld.java
 	@javac HelloWorld.java
 
-lib/libhello.so: lib/HelloWorldImpl.c Test.class
-	@gcc -shared -fPIC  -o lib/libhello.so lib/*.c
+lib/libhello.$(EXT): lib/HelloWorldImpl.c Test.class
+	@gcc $(LDFLAGS)  -o lib/libhello.$(EXT) lib/*.c
 
 lib/HelloWorldImpl.c: lib/HelloWorld.h
 Test.class: Test.java
@@ -14,4 +23,4 @@ run: HelloWorld.class
 	@java -Djava.library.path=lib HelloWorld
 
 clean:
-	@rm -f lib/*.jnilib lib/*.so *.class
+	@rm -f lib/*.$(EXT) *.class
