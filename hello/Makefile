@@ -1,16 +1,24 @@
-ifeq ($(shell uname),Darwin)
+
+ifdef win32
+TARGET=hello
+EXT=dll
+LDFLAGS=-shared -fPIC -lsteeze
+else ifeq ($(shell uname),Darwin)
+TARGET=libhello
 EXT=jnilib
 LDFLAGS=-dynamiclib -lsteeze
 else
+TARGET=libhello
 EXT=so
 LDFLAGS=-shared -fPIC -lsteeze
 endif
 
-HelloWorld.class: lib/libhello.$(EXT) HelloWorld.java
+
+HelloWorld.class: lib/$(TARGET).$(EXT) HelloWorld.java
 	@javac HelloWorld.java
 
-lib/libhello.$(EXT): lib/HelloWorldImpl.c Test.class
-	@gcc $(LDFLAGS)  -o lib/libhello.$(EXT) lib/*.c
+lib/$(TARGET).$(EXT): lib/HelloWorldImpl.c Test.class
+	@gcc $(LDFLAGS)  -o lib/$(TARGET).$(EXT) lib/*.c
 
 lib/HelloWorldImpl.c: lib/HelloWorld.h
 Test.class: Test.java
