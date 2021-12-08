@@ -9,7 +9,7 @@ class Test {
     public void show(){
         //错误测试
         int a=1;
-        int b=0;
+        int b=5;
         int c=a/b;
         System.out.println("in java=> show version: "+this.version);
     }
@@ -21,6 +21,8 @@ class Test {
 
     public static void main(String[] args)  
     {
+        System.out.println("java.library.path: ");
+        System.out.println(System.getProperty("java.library.path"));
         Test test=new Test(10);
         test.show();
         int num=10;

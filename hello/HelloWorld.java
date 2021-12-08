@@ -18,6 +18,10 @@ class HelloWorld {
     }
       
     public static void main(String[] args) {
+        
+        System.out.print("java.library.path: ");
+        System.out.println(System.getProperty("java.library.path"));
+        
         //调用上面声明的本地化方法  
         HelloWorld helloWorld=new HelloWorld();
 

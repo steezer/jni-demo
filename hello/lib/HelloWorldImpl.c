@@ -2,7 +2,7 @@
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
-#include <steeze/util.h>
+#include <stzc/util.h>
 
 static jint getMaxSupportVersion(){
 #ifdef JNI_VERSION_1_8
